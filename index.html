@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Pelaporan Kinerja Terpadu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --navy-950:#0A1A2A;
+  --navy-900:#0F2B46;
+  --navy-800:#173B5E;
+  --navy-700:#204C74;
+  --navy-100:#E6ECF1;
+  --paper:#F5F6F2;
+  --paper-card:#FFFFFF;
+  --ink:#182430;
+  --ink-soft:#5B6B78;
+  --ink-faint:#8B98A3;
+  --line:#E1E4DE;
+  --gold:#B9822F;
+  --gold-deep:#96691F;
+  --gold-soft:#F1E3C4;
+  --rust:#AE4530;
+  --rust-soft:#F5DED7;
+  --green:#2E7A57;
+  --green-soft:#DCEEE4;
+  --shadow-sm:0 1px 2px rgba(15,43,70,.06), 0 1px 1px rgba(15,43,70,.04);
+  --shadow-md:0 6px 20px rgba(15,43,70,.10);
+  --shadow-lg:0 18px 50px rgba(10,26,42,.24);
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --font-serif:'Lora', Georgia, serif;
+  --font-sans:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  font-size:15px;
+  line-height:1.5;
+}
+h1,h2,h3,h4{font-family:var(--font-serif); margin:0; color:var(--navy-950); font-weight:600;}
+p{margin:0;}
+button{font-family:inherit; cursor:pointer;}
+input,textarea,select{font-family:inherit; font-size:inherit;}
+a{color:inherit;}
+::selection{background:var(--gold-soft);}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+/* ============================================================
+   BACKGROUND PATTERN (subtle seal/rule motif)
+   ============================================================ */
+.bg-weave{
+  position:fixed; inset:0; z-index:-1;
+  background-color:var(--navy-950);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(185,130,47,.14), transparent 40%),
+    radial-gradient(circle at 88% 82%, rgba(185,130,47,.10), transparent 42%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 68px);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 18px; border-radius:var(--radius-sm); border:1px solid transparent;
+  font-size:14px; font-weight:600; letter-spacing:.1px; transition:background .15s, border-color .15s, transform .1s, box-shadow .15s;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--navy-900); color:#fff;}
+.btn-primary:hover{background:var(--navy-800);}
+.btn-gold{background:var(--gold); color:#fff;}
+.btn-gold:hover{background:var(--gold-deep);}
+.btn-ghost{background:transparent; color:var(--navy-900); border-color:var(--line);}
+.btn-ghost:hover{background:var(--navy-100);}
+.btn-danger{background:var(--rust); color:#fff;}
+.btn-danger:hover{background:#8f3623;}
+.btn-sm{padding:6px 12px; font-size:13px;}
+.btn:disabled{opacity:.6; cursor:not-allowed;}
+.btn-block{width:100%;}
+.icon-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; border-radius:8px; border:1px solid var(--line); background:#fff; color:var(--ink-soft);
+  transition:all .15s;
+}
+.icon-btn:hover{background:var(--navy-100); color:var(--navy-900); border-color:var(--navy-100);}
+.icon-btn.danger:hover{background:var(--rust-soft); color:var(--rust); border-color:var(--rust-soft);}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.field{margin-bottom:16px;}
+.field label{display:block; font-size:13px; font-weight:600; color:var(--navy-900); margin-bottom:6px;}
+.field .hint{display:block; font-size:12px; color:var(--ink-faint); margin-top:5px;}
+.input, textarea.input, select.input{
+  width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:var(--radius-sm);
+  background:#fff; color:var(--ink); transition:border-color .15s, box-shadow .15s;
+}
+.input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(185,130,47,.15); outline:none;}
+textarea.input{resize:vertical; min-height:110px; line-height:1.55;}
+.input-wrap{position:relative;}
+.input-wrap .toggle-visibility{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  background:none; border:none; color:var(--ink-faint); padding:6px; display:flex;
+}
+
+/* ============================================================
+   BADGES / PILLS
+   ============================================================ */
+.pill{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px; border-radius:999px; font-size:12px; font-weight:600;
+  background:var(--navy-100); color:var(--navy-800);
+}
+.pill.gold{background:var(--gold-soft); color:var(--gold-deep);}
+.pill.green{background:var(--green-soft); color:var(--green);}
+.pill.rust{background:var(--rust-soft); color:var(--rust);}
+.pill.outline{background:transparent; border:1px solid var(--line); color:var(--ink-soft);}
+
+/* ============================================================
+   LOGIN PAGE
+   ============================================================ */
+.login-shell{
+  min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px 20px;
+}
+.login-card{
+  width:100%; max-width:420px; background:var(--paper-card); border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg); overflow:hidden; position:relative;
+}
+.login-top{
+  padding:36px 34px 26px; text-align:center; position:relative;
+  background:linear-gradient(160deg, var(--navy-900), var(--navy-950));
+  color:#fff;
+}
+.seal{
+  width:60px; height:60px; margin:0 auto 16px; border-radius:50%;
+  border:2px solid var(--gold-soft); display:flex; align-items:center; justify-content:center;
+  position:relative; color:var(--gold-soft);
+}
+.seal::before{
+  content:''; position:absolute; inset:5px; border:1px solid rgba(241,227,196,.5); border-radius:50%;
+}
+.login-top h1{color:#fff; font-size:21px; margin-bottom:6px;}
+.login-top .sub{font-size:13px; color:rgba(255,255,255,.62); letter-spacing:.2px;}
+.login-body{padding:30px 34px 34px;}
+.login-error{
+  background:var(--rust-soft); color:var(--rust); border-radius:var(--radius-sm);
+  padding:10px 14px; font-size:13px; margin-bottom:18px; display:flex; gap:8px; align-items:flex-start;
+}
+.login-foot{
+  padding:16px 34px 26px; text-align:center;
+}
+.demo-toggle{
+  font-size:12.5px; color:var(--ink-faint); background:none; border:none; text-decoration:underline; text-underline-offset:3px;
+}
+.demo-box{
+  margin-top:14px; padding:12px 14px; background:var(--navy-100); border-radius:var(--radius-sm); font-size:12px; color:var(--navy-800); text-align:left;
+}
+.demo-box .row{display:flex; justify-content:space-between; padding:3px 0;}
+.gear-corner{
+  position:absolute; top:16px; right:16px; width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.7); background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+}
+.gear-corner:hover{background:rgba(255,255,255,.16); color:#fff;}
+.source-tag{
+  position:absolute; top:16px; left:16px; font-size:10.5px; padding:3px 9px; border-radius:999px;
+  background:rgba(255,255,255,.1); color:rgba(255,255,255,.75); border:1px solid rgba(255,255,255,.15); letter-spacing:.3px;
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app-shell{display:flex; min-height:100vh;}
+.sidebar{
+  width:264px; flex-shrink:0; background:linear-gradient(185deg, var(--navy-900), var(--navy-950));
+  color:#fff; display:flex; flex-direction:column; position:fixed; top:0; bottom:0; left:0; z-index:20;
+}
+.sidebar-brand{padding:24px 22px 20px; display:flex; gap:12px; align-items:center; border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-brand .seal{width:40px; height:40px; margin:0; flex-shrink:0;}
+.sidebar-brand .seal svg{width:18px; height:18px;}
+.brand-text .school{font-family:var(--font-serif); font-size:14.5px; line-height:1.25; font-weight:600;}
+.brand-text .system{font-size:11px; color:rgba(255,255,255,.55); margin-top:2px;}
+
+.user-card{margin:18px 16px; padding:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09); border-radius:var(--radius-md);}
+.user-card .name{font-weight:600; font-size:14px; margin-bottom:5px;}
+.user-card .role-pill{font-size:11px; padding:3px 9px;}
+
+.sidenav{flex:1; padding:6px 14px; display:flex; flex-direction:column; gap:2px; overflow-y:auto;}
+.sidenav-label{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,.35); padding:14px 10px 6px;}
+.sidenav a, .nav-item{
+  display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:8px;
+  color:rgba(255,255,255,.72); font-size:14px; font-weight:500; transition:background .15s, color .15s; border:none; background:none; text-align:left; width:100%;
+}
+.nav-item:hover{background:rgba(255,255,255,.06); color:#fff;}
+.nav-item.active{background:rgba(255,255,255,.12); color:#fff; box-shadow:inset 3px 0 0 var(--gold);}
+.nav-item .badge-count{
+  margin-left:auto; background:rgba(255,255,255,.14); font-size:11px; padding:1px 7px; border-radius:999px;
+}
+
+.sidebar-bottom{padding:14px; border-top:1px solid rgba(255,255,255,.08); display:flex; flex-direction:column; gap:2px;}
+.conn-status{display:flex; align-items:center; gap:7px; padding:8px 12px; font-size:11.5px; color:rgba(255,255,255,.5);}
+.conn-dot{width:7px; height:7px; border-radius:50%; background:var(--ink-faint); flex-shrink:0;}
+.conn-dot.on{background:#5FCB90;}
+.conn-dot.off{background:#E28A6E;}
+
+.main-col{flex:1; margin-left:264px; display:flex; flex-direction:column; min-height:100vh;}
+.topbar{
+  position:sticky; top:0; z-index:10; background:rgba(245,246,242,.9); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line); padding:18px 32px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.topbar h2{font-size:22px;}
+.topbar .desc{font-size:13px; color:var(--ink-soft); margin-top:3px;}
+.topbar-actions{display:flex; align-items:center; gap:10px;}
+.menu-toggle{display:none;}
+
+.content{padding:28px 32px 120px; flex:1;}
+
+.stat-row{display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; margin-bottom:26px;}
+.stat-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius-md); padding:16px 18px; box-shadow:var(--shadow-sm);}
+.stat-card .num{font-family:var(--font-serif); font-size:28px; color:var(--navy-950); font-weight:700; line-height:1;}
+.stat-card .lbl{font-size:12.5px; color:var(--ink-soft); margin-top:6px;}
+
+.tabs{display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line);}
+.tab{
+  padding:11px 4px; margin-right:22px; font-size:14px; font-weight:600; color:var(--ink-faint);
+  border-bottom:2px solid transparent; background:none; border-top:none; border-left:none; border-right:none;
+}
+.tab.active{color:var(--navy-950); border-bottom-color:var(--gold);}
+
+/* ============================================================
+   REPORT CARDS
+   ============================================================ */
+.report-list{display:flex; flex-direction:column; gap:12px;}
+.report-card{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius-md); box-shadow:var(--shadow-sm);
+  display:flex; overflow:hidden; transition:box-shadow .15s, transform .15s;
+}
+.report-card:hover{box-shadow:var(--shadow-md);}
+.report-accent{width:5px; flex-shrink:0;}
+.report-body{padding:16px 20px; flex:1; min-width:0;}
+.report-top{display:flex; justify-content:space-between; gap:14px; align-items:flex-start; margin-bottom:6px;}
+.report-nomor{font-size:11.5px; color:var(--gold-deep); font-weight:700; letter-spacing:.3px;}
+.report-title{font-size:16.5px; margin:3px 0 6px;}
+.report-excerpt{font-size:13.5px; color:var(--ink-soft); line-height:1.55; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+.report-meta{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px; font-size:12.5px; color:var(--ink-faint);}
+.report-meta .dot{width:3px; height:3px; border-radius:50%; background:var(--ink-faint);}
+.report-actions{display:flex; gap:8px; flex-shrink:0;}
+.from-tag{font-size:12px; color:var(--ink-soft);}
+.from-tag b{color:var(--navy-900);}
+
+.empty-state{
+  text-align:center; padding:70px 20px; color:var(--ink-soft);
+}
+.empty-state .icon-wrap{
+  width:56px; height:56px; border-radius:50%; background:var(--navy-100); color:var(--navy-800);
+  display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
+}
+.empty-state h3{font-size:17px; margin-bottom:6px; color:var(--navy-950);}
+.empty-state p{font-size:13.5px; max-width:320px; margin:0 auto;}
+
+/* ============================================================
+   FAB
+   ============================================================ */
+.fab{
+  position:fixed; right:32px; bottom:32px; z-index:15;
+  width:58px; height:58px; border-radius:50%; background:var(--gold); color:#fff; border:none;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(150,105,31,.4);
+  transition:transform .15s, background .15s;
+}
+.fab:hover{background:var(--gold-deep); transform:translateY(-2px) scale(1.03);}
+.fab:active{transform:translateY(0) scale(.97);}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(10,20,32,.55); backdrop-filter:blur(2px);
+  display:flex; align-items:center; justify-content:center; padding:20px; z-index:100;
+}
+.modal{
+  background:#fff; border-radius:var(--radius-lg); width:100%; max-width:540px; max-height:88vh;
+  display:flex; flex-direction:column; box-shadow:var(--shadow-lg); overflow:hidden;
+}
+.modal.narrow{max-width:420px;}
+.modal-head{padding:22px 26px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:flex-start; gap:14px;}
+.modal-head h3{font-size:18px;}
+.modal-head .close-x{color:var(--ink-faint); background:none; border:none; padding:4px; flex-shrink:0;}
+.modal-head .close-x:hover{color:var(--ink);}
+.modal-body{padding:22px 26px; overflow-y:auto;}
+.modal-foot{padding:16px 26px 22px; display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--line);}
+
+.chip-row{display:flex; flex-wrap:wrap; gap:7px;}
+.chip{background:var(--navy-100); color:var(--navy-800); font-size:12.5px; padding:5px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:5px;}
+
+.detail-block{margin-bottom:16px;}
+.detail-label{font-size:11.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--ink-faint); margin-bottom:4px; font-weight:600;}
+.detail-value{font-size:14.5px; color:var(--ink); line-height:1.6; white-space:pre-wrap;}
+
+.confirm-icon{
+  width:52px; height:52px; border-radius:50%; background:var(--rust-soft); color:var(--rust);
+  display:flex; align-items:center; justify-content:center; margin:4px auto 16px;
+}
+.confirm-text{text-align:center; font-size:14px; color:var(--ink-soft); line-height:1.6;}
+.confirm-text b{color:var(--ink);}
+
+/* ============================================================
+   LOADING OVERLAY
+   ============================================================ */
+#loading-overlay{
+  position:fixed; inset:0; background:rgba(10,20,32,.62); z-index:200;
+  display:none; align-items:center; justify-content:center; flex-direction:column; gap:16px;
+}
+#loading-overlay.show{display:flex;}
+.spinner{
+  width:38px; height:38px; border-radius:50%; border:3px solid rgba(255,255,255,.25); border-top-color:var(--gold);
+  animation:spin .8s linear infinite;
+}
+.spin-small{
+  width:15px; height:15px; border-radius:50%; border:2px solid rgba(255,255,255,.35); border-top-color:#fff;
+  animation:spin .7s linear infinite; display:inline-block;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{color:#fff; font-size:14px; font-weight:500;}
+
+/* ============================================================
+   TOASTS
+   ============================================================ */
+#toast-container{position:fixed; bottom:24px; left:24px; z-index:300; display:flex; flex-direction:column; gap:10px;}
+.toast{
+  background:var(--navy-950); color:#fff; padding:12px 16px; border-radius:var(--radius-sm); font-size:13.5px;
+  box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:10px; max-width:340px;
+  animation:toastIn .25s ease;
+}
+.toast.success{border-left:3px solid var(--green);}
+.toast.error{border-left:3px solid var(--rust);}
+.toast.info{border-left:3px solid var(--gold);}
+@keyframes toastIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+/* ============================================================
+   SETTINGS MODAL
+   ============================================================ */
+.settings-note{
+  background:var(--navy-100); color:var(--navy-800); font-size:12.5px; padding:12px 14px; border-radius:var(--radius-sm);
+  margin-bottom:18px; line-height:1.55;
+}
+.field-row{display:flex; gap:12px;}
+.field-row .field{flex:1;}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 880px){
+  .sidebar{transform:translateX(-100%); transition:transform .2s; box-shadow:var(--shadow-lg);}
+  .sidebar.open{transform:translateX(0);}
+  .main-col{margin-left:0;}
+  .menu-toggle{display:flex;}
+  .content{padding:22px 16px 120px;}
+  .topbar{padding:14px 16px;}
+  .fab{right:20px; bottom:20px;}
+  .report-top{flex-direction:column;}
+  .field-row{flex-direction:column; gap:0;}
+}
+.overlay-backdrop{position:fixed; inset:0; background:rgba(10,20,32,.4); z-index:19; display:none;}
+.overlay-backdrop.show{display:block;}
+</style>
+</head>
+<body>
+<div class="bg-weave"></div>
+<div id="app"></div>
+<div id="toast-container"></div>
+<div id="loading-overlay"><div class="spinner"></div><div class="loading-text" id="loading-text">Memuat...</div></div>
+
+<script>
+/* ================================================================
+   DATA CADANGAN (dipakai saat belum terhubung ke GitHub / mode lokal
+   pertama kali). Data nyata tetap disimpan/dimuat dari data.json
+   melalui GitHub Contents API begitu Pengaturan Server diisi.
+   ================================================================ */
+window.__DUMMY_DATA__ = {
+  "meta": { "namaSekolah": "SMA Negeri 1 Harapan Bangsa", "deskripsi": "Data Sistem Pelaporan Kinerja Terpadu", "diperbarui": "2026-09-05T07:30:00+08:00" },
+  "users": [
+    { "id": "u1", "username": "budi.bk", "password": "sekolah123", "nama": "Budi Santoso, S.Pd.", "role": "guru_bk" },
+    { "id": "u2", "username": "siti.osis", "password": "sekolah123", "nama": "Siti Aminah, S.Pd.", "role": "organisasi" },
+    { "id": "u3", "username": "andi.wakasek", "password": "sekolah123", "nama": "Drs. Andi Wijaya, M.Pd.", "role": "wakasek_kesiswaan" },
+    { "id": "u4", "username": "rina.kurikulum", "password": "sekolah123", "nama": "Rina Kurnia, M.Pd.", "role": "kurikulum" },
+    { "id": "u5", "username": "dedi.humas", "password": "sekolah123", "nama": "Dedi Prasetyo, S.Sos.", "role": "humas" },
+    { "id": "u6", "username": "wati.sarpras", "password": "sekolah123", "nama": "Wati Suherman, S.T.", "role": "sarpras" },
+    { "id": "u7", "username": "joko.tu", "password": "sekolah123", "nama": "Joko Susilo, S.E.", "role": "tata_usaha" },
+    { "id": "u8", "username": "hendra.kepsek", "password": "sekolah123", "nama": "Dr. Hendra Gunawan, M.M.", "role": "kepala_sekolah" },
+    { "id": "u9", "username": "sri.pengawas", "password": "sekolah123", "nama": "Dra. Sri Wahyuni, M.Pd.", "role": "pengawas" }
+  ],
+  "reports": [
+    { "id": "r1001", "nomor": "001/BK/IX/2026", "authorId": "u1", "authorRole": "guru_bk", "recipients": ["wakasek_kesiswaan","kepala_sekolah"], "judul": "Laporan Konseling Siswa Bulan Agustus", "isi": "Selama bulan Agustus 2026 telah dilaksanakan layanan konseling individu kepada 18 siswa dan konseling kelompok pada 4 kelas. Fokus utama pada penyesuaian diri siswa baru kelas X dan pembinaan motivasi belajar. Tidak ditemukan kasus yang memerlukan eskalasi ke pihak luar sekolah.", "tanggal": "2026-08-30", "createdAt": "2026-08-30T09:12:00+08:00", "updatedAt": "2026-08-30T09:12:00+08:00" },
+    { "id": "r1002", "nomor": "002/BK/IX/2026", "authorId": "u1", "authorRole": "guru_bk", "recipients": ["wakasek_kesiswaan","kepala_sekolah"], "judul": "Laporan Penanganan Kasus Kedisiplinan Kelas XI", "isi": "Ditemukan 3 kasus keterlambatan berulang pada siswa kelas XI IPA 2. Telah dilakukan pemanggilan orang tua dan penandatanganan surat komitmen perbaikan. Rekomendasi: pemantauan kehadiran selama 2 minggu ke depan.", "tanggal": "2026-09-02", "createdAt": "2026-09-02T10:05:00+08:00", "updatedAt": "2026-09-02T10:05:00+08:00" },
+    { "id": "r1003", "nomor": "001/OSIS/IX/2026", "authorId": "u2", "authorRole": "organisasi", "recipients": ["wakasek_kesiswaan","kepala_sekolah"], "judul": "Laporan Kegiatan Masa Pengenalan Lingkungan Sekolah", "isi": "Kegiatan MPLS bagi siswa baru telah terlaksana dengan lancar selama 3 hari. Total peserta 312 siswa. Seluruh rangkaian acara berjalan sesuai jadwal tanpa kendala berarti. Dokumentasi dan absensi terlampir pada berkas terpisah.", "tanggal": "2026-07-20", "createdAt": "2026-07-20T14:30:00+08:00", "updatedAt": "2026-07-20T14:30:00+08:00" },
+    { "id": "r1004", "nomor": "002/OSIS/IX/2026", "authorId": "u2", "authorRole": "organisasi", "recipients": ["wakasek_kesiswaan","kepala_sekolah"], "judul": "Laporan Persiapan Peringatan HUT Kemerdekaan RI", "isi": "Panitia OSIS telah menyelesaikan 90% persiapan lomba dan upacara peringatan HUT RI ke-81. Kebutuhan tambahan berupa sound system portable untuk lapangan utama sedang diajukan ke bagian sarana prasarana.", "tanggal": "2026-08-14", "createdAt": "2026-08-14T11:00:00+08:00", "updatedAt": "2026-08-14T11:00:00+08:00" },
+    { "id": "r1005", "nomor": "001/WAKASEK-KES/IX/2026", "authorId": "u3", "authorRole": "wakasek_kesiswaan", "recipients": ["kepala_sekolah","pengawas"], "judul": "Rekapitulasi Kesiswaan Semester Ganjil Bulan Agustus", "isi": "Rekapitulasi menyeluruh kegiatan kesiswaan bulan Agustus mencakup laporan BK dan OSIS. Tingkat kehadiran siswa rata-rata 96,4%. Tidak ada pelanggaran berat. Kegiatan ekstrakurikuler berjalan sesuai program kerja tahunan.", "tanggal": "2026-08-31", "createdAt": "2026-08-31T16:00:00+08:00", "updatedAt": "2026-08-31T16:00:00+08:00" },
+    { "id": "r1006", "nomor": "001/KUR/IX/2026", "authorId": "u4", "authorRole": "kurikulum", "recipients": ["kepala_sekolah","pengawas"], "judul": "Laporan Capaian Kurikulum Merdeka Triwulan III", "isi": "Implementasi Kurikulum Merdeka pada kelas X dan XI berjalan sesuai rencana. Rata-rata capaian pembelajaran mencapai 82%. Pelatihan asesmen formatif bagi guru mata pelajaran direncanakan pada minggu ketiga September.", "tanggal": "2026-09-01", "createdAt": "2026-09-01T08:45:00+08:00", "updatedAt": "2026-09-01T08:45:00+08:00" },
+    { "id": "r1007", "nomor": "001/HUMAS/IX/2026", "authorId": "u5", "authorRole": "humas", "recipients": ["kepala_sekolah","pengawas"], "judul": "Laporan Kerja Sama dengan Mitra Industri", "isi": "Telah dijajaki kerja sama praktik kerja lapangan dengan 4 perusahaan mitra baru di bidang teknologi informasi. Penandatanganan nota kesepahaman (MoU) direncanakan pada akhir September 2026.", "tanggal": "2026-09-03", "createdAt": "2026-09-03T13:20:00+08:00", "updatedAt": "2026-09-03T13:20:00+08:00" },
+    { "id": "r1008", "nomor": "001/SARPRAS/IX/2026", "authorId": "u6", "authorRole": "sarpras", "recipients": ["kepala_sekolah","pengawas"], "judul": "Laporan Kondisi dan Perawatan Fasilitas Laboratorium", "isi": "Perawatan berkala laboratorium komputer dan IPA telah dilaksanakan. Terdapat 3 unit komputer yang memerlukan penggantian komponen. Pengajuan anggaran perbaikan telah disampaikan ke bagian tata usaha.", "tanggal": "2026-08-28", "createdAt": "2026-08-28T09:00:00+08:00", "updatedAt": "2026-08-28T09:00:00+08:00" },
+    { "id": "r1009", "nomor": "001/TU/IX/2026", "authorId": "u7", "authorRole": "tata_usaha", "recipients": ["kepala_sekolah","pengawas"], "judul": "Laporan Administrasi Keuangan dan Kepegawaian Bulan Agustus", "isi": "Realisasi anggaran operasional bulan Agustus mencapai 78% dari pagu triwulan. Seluruh administrasi kepegawaian termasuk absensi dan penggajian telah diselesaikan tepat waktu tanpa kendala.", "tanggal": "2026-08-31", "createdAt": "2026-08-31T17:10:00+08:00", "updatedAt": "2026-08-31T17:10:00+08:00" },
+    { "id": "r1010", "nomor": "001/KEPSEK/IX/2026", "authorId": "u8", "authorRole": "kepala_sekolah", "recipients": ["pengawas"], "judul": "Laporan Kinerja Sekolah Triwulan III Tahun Ajaran 2026/2027", "isi": "Secara umum seluruh bidang menunjukkan kinerja yang baik. Kesiswaan, kurikulum, humas, sarana prasarana, dan tata usaha telah menyampaikan laporan rutin dan menunjukkan capaian sesuai target. Fokus perbaikan pada pemeliharaan fasilitas laboratorium.", "tanggal": "2026-09-04", "createdAt": "2026-09-04T15:00:00+08:00", "updatedAt": "2026-09-04T15:00:00+08:00" }
+  ]
+};
+
+/* ================================================================
+   KONFIGURASI PERAN & ALUR PELAPORAN
+   ================================================================ */
+const ROLE_LABELS = {
+  guru_bk:            'Guru BK',
+  organisasi:         'Organisasi Siswa (OSIS)',
+  wakasek_kesiswaan:  'Wakasek Kesiswaan',
+  kurikulum:          'Wakasek Kurikulum',
+  humas:              'Wakasek Humas',
+  sarpras:            'Sarana Prasarana',
+  tata_usaha:         'Tata Usaha',
+  kepala_sekolah:     'Kepala Sekolah',
+  pengawas:           'Pengawas Sekolah'
+};
+const ROLE_CODE = {
+  guru_bk:'BK', organisasi:'OSIS', wakasek_kesiswaan:'WAKASEK-KES', kurikulum:'KUR',
+  humas:'HUMAS', sarpras:'SARPRAS', tata_usaha:'TU', kepala_sekolah:'KEPSEK', pengawas:'PENGAWAS'
+};
+const ROLE_COLOR = {
+  guru_bk:'#3D6E93', organisasi:'#5C7F4F', wakasek_kesiswaan:'#B9822F', kurikulum:'#8E5CA8',
+  humas:'#B9822F', sarpras:'#4F8A8B', tata_usaha:'#7A6A53', kepala_sekolah:'#AE4530', pengawas:'#0F2B46'
+};
+// peta: peran -> daftar peran penerima laporan
+const ROLE_RECIPIENTS = {
+  guru_bk:            ['wakasek_kesiswaan','kepala_sekolah'],
+  organisasi:         ['wakasek_kesiswaan','kepala_sekolah'],
+  wakasek_kesiswaan:  ['kepala_sekolah','pengawas'],
+  kurikulum:          ['kepala_sekolah','pengawas'],
+  humas:              ['kepala_sekolah','pengawas'],
+  sarpras:            ['kepala_sekolah','pengawas'],
+  tata_usaha:         ['kepala_sekolah','pengawas'],
+  kepala_sekolah:     ['pengawas'],
+  pengawas:           []
+};
+const SENDING_ROLES = Object.keys(ROLE_RECIPIENTS).filter(r => ROLE_RECIPIENTS[r].length > 0);
+const RECEIVING_ROLES = ['wakasek_kesiswaan','kepala_sekolah','pengawas'];
+const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+
+const DUMMY_DATA_FALLBACK = { meta:{namaSekolah:'SMA Negeri 1 Harapan Bangsa'}, users:[], reports:[] };
+
+/* ================================================================
+   IKON (SVG inline, gaya garis tipis)
+   ================================================================ */
+function icon(name, size){
+  size = size || 18;
+  const p = {
+    plus:        '<path d="M12 5v14M5 12h14"/>',
+    pencil:      '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    trash:       '<path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-.9 13.1a2 2 0 0 1-2 1.9H7.9a2 2 0 0 1-2-1.9L5 6"/><path d="M10 11v6M14 11v6"/>',
+    eye:         '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+    x:           '<path d="M18 6 6 18M6 6l12 12"/>',
+    check:       '<path d="M20 6 9 17l-5-5"/>',
+    settings:    '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.36a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.64 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.64a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/>',
+    logout:      '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+    refresh:     '<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+    chevron:     '<path d="m6 9 6 6 6-6"/>',
+    alert:       '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>',
+    building:    '<path d="M6 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18"/><path d="M2 22h20"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/>',
+    user:        '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4.5 5-6 8-6s6.5 1.5 8 6"/>',
+    send:        '<path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7Z"/>',
+    inbox:       '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.4 5 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.4-7A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.9 1Z"/>',
+    key:         '<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+    wifi:        '<path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.5a15 15 0 0 1 20 0"/><path d="M12 20h.01"/>',
+    file:        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/>',
+    menu:        '<path d="M3 12h18M3 6h18M3 18h18"/>',
+    calendar:    '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'
+  };
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p[name]||''}</svg>`;
+}
+
+/* ================================================================
+   STATE
+   ================================================================ */
+const state = {
+  config: null,        // {owner, repo, branch, path, token}
+  source: 'local',      // 'github' | 'local'
+  data: null,           // {meta, users, reports}
+  sha: null,
+  currentUser: null,
+  activeTab: 'mine',    // 'mine' | 'inbox'
+  sidebarOpen: false,
+  loginError: '',
+  showDemoHint: false,
+  busy: false
+};
+
+/* ================================================================
+   PENYIMPANAN LOKAL
+   ================================================================ */
+const LS_CONFIG = 'lapor_gh_config';
+const LS_LOCAL_DATA = 'lapor_local_data';
+const LS_SESSION = 'lapor_session_user';
+
+function loadConfig(){
+  try{ return JSON.parse(localStorage.getItem(LS_CONFIG)) || null; }catch(e){ return null; }
+}
+function saveConfigToStorage(cfg){ localStorage.setItem(LS_CONFIG, JSON.stringify(cfg)); }
+function loadLocalData(){
+  try{ return JSON.parse(localStorage.getItem(LS_LOCAL_DATA)); }catch(e){ return null; }
+}
+function saveLocalData(data){ localStorage.setItem(LS_LOCAL_DATA, JSON.stringify(data)); }
+
+/* ================================================================
+   BASE64 UTF-8 HELPERS (untuk GitHub Contents API)
+   ================================================================ */
+function b64EncodeUnicode(str){
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m,p1)=>String.fromCharCode('0x'+p1)));
+}
+function b64DecodeUnicode(str){
+  const clean = str.replace(/\n/g,'');
+  return decodeURIComponent(atob(clean).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
+/* ================================================================
+   GITHUB CONTENTS API
+   ================================================================ */
+function ghUrl(cfg){
+  return `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(cfg.path).replace(/%2F/g,'/')}`;
+}
+async function ghFetchData(cfg){
+  const headers = {'Accept':'application/vnd.github+json'};
+  if(cfg.token) headers['Authorization'] = 'Bearer ' + cfg.token;
+  const res = await fetch(ghUrl(cfg) + '?ref=' + encodeURIComponent(cfg.branch || 'main'), {headers});
+  if(!res.ok){
+    const body = await res.json().catch(()=>({}));
+    throw new Error(body.message || ('GitHub API error: ' + res.status));
+  }
+  const json = await res.json();
+  const content = JSON.parse(b64DecodeUnicode(json.content));
+  return {content, sha: json.sha};
+}
+async function ghSaveData(cfg, dataObj, sha, message){
+  if(!cfg.token) throw new Error('Token akses (Personal Access Token) belum diisi di Pengaturan Server.');
+  const headers = {'Accept':'application/vnd.github+json', 'Authorization':'Bearer ' + cfg.token, 'Content-Type':'application/json'};
+  const body = {
+    message: message || 'Perbarui data laporan',
+    content: b64EncodeUnicode(JSON.stringify(dataObj, null, 2)),
+    branch: cfg.branch || 'main'
+  };
+  if(sha) body.sha = sha;
+  const res = await fetch(ghUrl(cfg), {method:'PUT', headers, body:JSON.stringify(body)});
+  if(!res.ok){
+    const errBody = await res.json().catch(()=>({}));
+    throw new Error(errBody.message || ('GitHub API error: ' + res.status));
+  }
+  const json = await res.json();
+  return json.content.sha;
+}
+
+/* ================================================================
+   INISIALISASI DATA
+   ================================================================ */
+async function initData(){
+  state.config = loadConfig();
+  if(state.config && state.config.owner && state.config.repo){
+    try{
+      showLoading('Memuat data dari GitHub...');
+      const {content, sha} = await ghFetchData(state.config);
+      state.data = content;
+      state.sha = sha;
+      state.source = 'github';
+      hideLoading();
+      return;
+    }catch(err){
+      hideLoading();
+      toast('error', 'Gagal memuat dari GitHub: ' + err.message + ' — beralih ke data lokal.');
+    }
+  }
+  const local = loadLocalData();
+  if(local){ state.data = local; }
+  else { state.data = JSON.parse(JSON.stringify(window.__DUMMY_DATA__ || DUMMY_DATA_FALLBACK)); saveLocalData(state.data); }
+  state.source = 'local';
+}
+
+async function refetchFromGithub(silent){
+  if(state.source !== 'github' || !state.config) return;
+  try{
+    if(!silent) showLoading('Memuat ulang data...');
+    const {content, sha} = await ghFetchData(state.config);
+    state.data = content;
+    state.sha = sha;
+    if(!silent) hideLoading();
+    render();
+  }catch(err){
+    if(!silent) { hideLoading(); toast('error', 'Gagal memuat ulang: ' + err.message); }
+  }
+}
+// polling ringan untuk mensimulasikan pembaruan realtime setiap 25 detik
+setInterval(()=>{
+  if(state.currentUser && document.querySelectorAll('.modal-overlay').length===0){
+    refetchFromGithub(true);
+  }
+}, 25000);
+
+/* ================================================================
+   PERSISTENSI PERUBAHAN
+   ================================================================ */
+async function persist(commitMessage){
+  if(state.source === 'github'){
+    showLoading('Menyimpan laporan ke GitHub...');
+    try{
+      const newSha = await ghSaveData(state.config, state.data, state.sha, commitMessage);
+      state.sha = newSha;
+      hideLoading();
+      return true;
+    }catch(err){
+      hideLoading();
+      toast('error', 'Gagal menyimpan: ' + err.message);
+      return false;
+    }
+  } else {
+    showLoading('Menyimpan data...');
+    await new Promise(r=>setTimeout(r, 550));
+    saveLocalData(state.data);
+    hideLoading();
+    return true;
+  }
+}
+
+/* ================================================================
+   AUTENTIKASI
+   ================================================================ */
+function attemptLogin(username, password){
+  const user = (state.data.users||[]).find(u => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password);
+  if(!user){ state.loginError = 'Nama pengguna atau kata sandi salah.'; render(); return; }
+  state.currentUser = user;
+  state.loginError = '';
+  state.activeTab = SENDING_ROLES.includes(user.role) ? 'mine' : 'inbox';
+  sessionStorage.setItem(LS_SESSION, user.id);
+  render();
+}
+function logout(){
+  state.currentUser = null;
+  sessionStorage.removeItem(LS_SESSION);
+  render();
+}
+function restoreSession(){
+  const id = sessionStorage.getItem(LS_SESSION);
+  if(id){
+    const user = (state.data.users||[]).find(u=>u.id===id);
+    if(user){ state.currentUser = user; state.activeTab = SENDING_ROLES.includes(user.role) ? 'mine' : 'inbox'; }
+  }
+}
+
+/* ================================================================
+   UTIL
+   ================================================================ */
+function fmtDate(iso){
+  if(!iso) return '-';
+  const d = new Date(iso + (iso.length<=10 ? 'T00:00:00' : ''));
+  const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+}
+function nextNomor(role, tanggalISO){
+  const code = ROLE_CODE[role];
+  const d = new Date(tanggalISO || Date.now());
+  const year = d.getFullYear();
+  const count = (state.data.reports||[]).filter(r => r.authorRole === role).length + 1;
+  return `${String(count).padStart(3,'0')}/${code}/${ROMAN[d.getMonth()+1]}/${year}`;
+}
+function uid(){ return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function userById(id){ return (state.data.users||[]).find(u=>u.id===id); }
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+function toast(type, msg){
+  const box = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  const iconName = type==='success'?'check':(type==='error'?'alert':'wifi');
+  el.innerHTML = icon(iconName,16) + '<span>' + escapeHtml(msg) + '</span>';
+  box.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 4200);
+}
+function showLoading(text){
+  document.getElementById('loading-text').textContent = text || 'Memproses...';
+  document.getElementById('loading-overlay').classList.add('show');
+}
+function hideLoading(){ document.getElementById('loading-overlay').classList.remove('show'); }
+
+/* ================================================================
+   MODAL HELPERS
+   ================================================================ */
+function openModalHTML(html){
+  const wrap = document.createElement('div');
+  wrap.className = 'modal-overlay';
+  wrap.id = 'active-modal';
+  wrap.innerHTML = html;
+  wrap.addEventListener('mousedown', (e)=>{ if(e.target===wrap) closeModal(); });
+  document.body.appendChild(wrap);
+}
+function closeModal(){
+  const m = document.getElementById('active-modal');
+  if(m) m.remove();
+}
+
+/* ================================================================
+   RENDER: LOGIN
+   ================================================================ */
+function renderLogin(){
+  const namaSekolah = (state.data.meta && state.data.meta.namaSekolah) || 'Sekolah';
+  const app = document.getElementById('app');
+  app.innerHTML = `
+  <div class="login-shell">
+    <div class="login-card">
+      <div class="login-top">
+        <span class="source-tag">${state.source==='github' ? 'Terhubung GitHub' : 'Mode Lokal'}</span>
+        <button class="gear-corner" id="btn-open-settings" title="Pengaturan Server" aria-label="Pengaturan Server">${icon('settings',17)}</button>
+        <div class="seal">${icon('building',24)}</div>
+        <h1>Sistem Pelaporan Kinerja Terpadu</h1>
+        <div class="sub">${escapeHtml(namaSekolah)}</div>
+      </div>
+      <div class="login-body">
+        ${state.loginError ? `<div class="login-error">${icon('alert',16)}<span>${escapeHtml(state.loginError)}</span></div>` : ''}
+        <form id="login-form">
+          <div class="field">
+            <label for="f-username">Nama Pengguna</label>
+            <input class="input" id="f-username" name="username" type="text" placeholder="mis. andi.wakasek" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label for="f-password">Kata Sandi</label>
+            <div class="input-wrap">
+              <input class="input" id="f-password" name="password" type="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" id="login-submit-btn">Masuk</button>
+        </form>
+        <div style="text-align:center; margin-top:16px;">
+          <button class="demo-toggle" id="toggle-demo">${state.showDemoHint ? 'Sembunyikan akun demo' : 'Lihat akun demo'}</button>
+        </div>
+        ${state.showDemoHint ? renderDemoHint() : ''}
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('login-form').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const username = document.getElementById('f-username').value;
+    const password = document.getElementById('f-password').value;
+    attemptLogin(username, password);
+  });
+  document.getElementById('toggle-demo').addEventListener('click', ()=>{ state.showDemoHint = !state.showDemoHint; render(); });
+  document.getElementById('btn-open-settings').addEventListener('click', openSettingsModal);
+}
+function renderDemoHint(){
+  const rows = (state.data.users||[]).map(u=>`<div class="row"><span>${escapeHtml(u.username)}</span><span>${ROLE_LABELS[u.role]||u.role}</span></div>`).join('');
+  return `<div class="demo-box"><div class="row" style="font-weight:700;"><span>Pengguna</span><span>Peran</span></div>${rows}<div class="row" style="margin-top:6px; border-top:1px dashed rgba(15,43,70,.2); padding-top:8px;"><span>Kata sandi semua akun demo</span><b>sekolah123</b></div></div>`;
+}
+
+/* ================================================================
+   RENDER: APP SHELL (DASHBOARD)
+   ================================================================ */
+function currentReports(){
+  const role = state.currentUser.role;
+  const uidNow = state.currentUser.id;
+  const all = state.data.reports || [];
+  if(state.activeTab === 'mine'){
+    return all.filter(r=>r.authorId===uidNow).sort((a,b)=> new Date(b.tanggal) - new Date(a.tanggal));
+  } else {
+    return all.filter(r=> (r.recipients||[]).includes(role)).sort((a,b)=> new Date(b.tanggal) - new Date(a.tanggal));
+  }
+}
+
+function renderShell(){
+  const app = document.getElementById('app');
+  const role = state.currentUser.role;
+  const canSend = SENDING_ROLES.includes(role);
+  const canReceive = RECEIVING_ROLES.includes(role);
+  const mineCount = (state.data.reports||[]).filter(r=>r.authorId===state.currentUser.id).length;
+  const inboxCount = (state.data.reports||[]).filter(r=>(r.recipients||[]).includes(role)).length;
+  const namaSekolah = (state.data.meta && state.data.meta.namaSekolah) || 'Sekolah';
+
+  app.innerHTML = `
+  <div class="overlay-backdrop" id="sidebar-backdrop"></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="seal">${icon('building',18)}</div>
+        <div class="brand-text">
+          <div class="school">${escapeHtml(namaSekolah)}</div>
+          <div class="system">Pelaporan Kinerja Terpadu</div>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="name">${escapeHtml(state.currentUser.nama)}</div>
+        <span class="pill gold role-pill">${ROLE_LABELS[role]}</span>
+      </div>
+      <nav class="sidenav">
+        <div class="sidenav-label">Menu</div>
+        ${canSend ? `<button class="nav-item ${state.activeTab==='mine'?'active':''}" data-action="tab" data-tab="mine">${icon('send',17)}<span>Laporan Saya</span><span class="badge-count">${mineCount}</span></button>` : ''}
+        ${canReceive ? `<button class="nav-item ${state.activeTab==='inbox'?'active':''}" data-action="tab" data-tab="inbox">${icon('inbox',17)}<span>Laporan Masuk</span><span class="badge-count">${inboxCount}</span></button>` : ''}
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="conn-status">
+          <span class="conn-dot ${state.source==='github'?'on':'off'}"></span>
+          <span>${state.source==='github' ? 'Terhubung ke GitHub' : 'Mode lokal (belum terhubung)'}</span>
+        </div>
+        <button class="nav-item" data-action="refresh">${icon('refresh',17)}<span>Muat Ulang Data</span></button>
+        <button class="nav-item" data-action="open-settings">${icon('settings',17)}<span>Pengaturan Server</span></button>
+        <button class="nav-item" data-action="logout">${icon('logout',17)}<span>Keluar</span></button>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <header class="topbar">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button class="icon-btn menu-toggle" id="btn-menu-toggle" aria-label="Buka menu">${icon('menu',18)}</button>
+          <div>
+            <h2>${state.activeTab==='mine' ? 'Laporan Saya' : 'Laporan Masuk'}</h2>
+            <div class="desc">${state.activeTab==='mine' ? 'Laporan yang Anda kirimkan kepada ' + describeRecipients(role) : 'Laporan yang ditujukan kepada Anda'}</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="btn-refresh-top" title="Muat ulang">${icon('refresh',17)}</button>
+        </div>
+      </header>
+      <div class="content" id="content-area">
+        ${renderContentInner()}
+      </div>
+    </div>
+  </div>
+  ${(state.activeTab==='mine' && canSend) ? `<button class="fab" id="btn-fab-add" aria-label="Tambah laporan">${icon('plus',26)}</button>` : ''}
+  `;
+
+  bindShellEvents();
+}
+
+function describeRecipients(role){
+  const rec = ROLE_RECIPIENTS[role] || [];
+  return rec.map(r=>ROLE_LABELS[r]).join(' dan ');
+}
+
+function renderContentInner(){
+  const reports = currentReports();
+  if(reports.length === 0){
+    if(state.activeTab==='mine'){
+      return `<div class="empty-state">
+        <div class="icon-wrap">${icon('file',26)}</div>
+        <h3>Belum ada laporan</h3>
+        <p>Anda belum membuat laporan. Gunakan tombol tambah di pojok kanan bawah untuk membuat laporan pertama Anda.</p>
+      </div>`;
+    }
+    return `<div class="empty-state">
+        <div class="icon-wrap">${icon('inbox',26)}</div>
+        <h3>Belum ada laporan masuk</h3>
+        <p>Laporan yang ditujukan kepada Anda akan muncul di sini.</p>
+      </div>`;
+  }
+  return `<div class="report-list">${reports.map(r=>renderReportCard(r)).join('')}</div>`;
+}
+
+function renderReportCard(r){
+  const isMine = state.activeTab === 'mine';
+  const color = ROLE_COLOR[r.authorRole] || 'var(--navy-800)';
+  const author = userById(r.authorId);
+  const recipientsChips = (r.recipients||[]).map(role=>`<span class="pill outline">${ROLE_LABELS[role]}</span>`).join('');
+  return `
+  <div class="report-card" data-report-id="${r.id}">
+    <div class="report-accent" style="background:${color};"></div>
+    <div class="report-body">
+      <div class="report-top">
+        <div style="min-width:0;">
+          <div class="report-nomor">No. ${escapeHtml(r.nomor||'-')}</div>
+          <h3 class="report-title">${escapeHtml(r.judul)}</h3>
+          <p class="report-excerpt">${escapeHtml(r.isi)}</p>
+        </div>
+        <div class="report-actions">
+          ${isMine ? `
+            <button class="icon-btn" data-action="edit" data-id="${r.id}" title="Ubah laporan" aria-label="Ubah laporan">${icon('pencil',16)}</button>
+            <button class="icon-btn danger" data-action="delete" data-id="${r.id}" title="Hapus laporan" aria-label="Hapus laporan">${icon('trash',16)}</button>
+          ` : `
+            <button class="icon-btn" data-action="view" data-id="${r.id}" title="Lihat detail" aria-label="Lihat detail">${icon('eye',16)}</button>
+          `}
+        </div>
+      </div>
+      <div class="report-meta">
+        <span>${icon('calendar',13)} ${fmtDate(r.tanggal)}</span>
+        <span class="dot"></span>
+        ${isMine ? recipientsChips : `<span class="from-tag">Dari: <b>${escapeHtml(author?author.nama:'-')}</b> · ${ROLE_LABELS[r.authorRole]}</span>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ================================================================
+   EVENT BINDING (SHELL)
+   ================================================================ */
+function bindShellEvents(){
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const menuToggle = document.getElementById('btn-menu-toggle');
+  if(menuToggle){
+    menuToggle.addEventListener('click', ()=>{ sidebar.classList.add('open'); backdrop.classList.add('show'); });
+  }
+  backdrop.addEventListener('click', ()=>{ sidebar.classList.remove('open'); backdrop.classList.remove('show'); });
+
+  document.querySelectorAll('[data-action="tab"]').forEach(el=>{
+    el.addEventListener('click', ()=>{ state.activeTab = el.dataset.tab; render(); });
+  });
+  const refreshBtn = document.getElementById('btn-refresh-top');
+  if(refreshBtn) refreshBtn.addEventListener('click', ()=>{
+    if(state.source==='github') refetchFromGithub(false);
+    else toast('info','Mode lokal aktif — data tersimpan di peramban ini.');
+  });
+  const sideRefresh = document.querySelector('[data-action="refresh"]');
+  if(sideRefresh) sideRefresh.addEventListener('click', ()=>{
+    if(state.source==='github') refetchFromGithub(false);
+    else toast('info','Mode lokal aktif — data tersimpan di peramban ini.');
+  });
+  const settingsBtn = document.querySelector('[data-action="open-settings"]');
+  if(settingsBtn) settingsBtn.addEventListener('click', openSettingsModal);
+  const logoutBtn = document.querySelector('[data-action="logout"]');
+  if(logoutBtn) logoutBtn.addEventListener('click', logout);
+
+  const fab = document.getElementById('btn-fab-add');
+  if(fab) fab.addEventListener('click', ()=> openReportModal(null));
+
+  document.querySelectorAll('[data-action="edit"]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const r = (state.data.reports||[]).find(x=>x.id===el.dataset.id);
+      openReportModal(r);
+    });
+  });
+  document.querySelectorAll('[data-action="delete"]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const r = (state.data.reports||[]).find(x=>x.id===el.dataset.id);
+      openDeleteModal(r);
+    });
+  });
+  document.querySelectorAll('[data-action="view"]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const r = (state.data.reports||[]).find(x=>x.id===el.dataset.id);
+      openViewModal(r);
+    });
+  });
+}
+
+/* ================================================================
+   MODAL: TAMBAH / UBAH LAPORAN
+   ================================================================ */
+function openReportModal(existing){
+  const isEdit = !!existing;
+  const role = state.currentUser.role;
+  const recipients = ROLE_RECIPIENTS[role] || [];
+  const todayISO = new Date().toISOString().slice(0,10);
+  const html = `
+  <div class="modal">
+    <div class="modal-head">
+      <h3>${isEdit ? 'Ubah Laporan' : 'Buat Laporan Baru'}</h3>
+      <button class="close-x" data-action="close">${icon('x',20)}</button>
+    </div>
+    <form id="report-form">
+      <div class="modal-body">
+        <div class="field">
+          <label>Ditujukan Kepada</label>
+          <div class="chip-row">${recipients.map(r=>`<span class="chip">${ROLE_LABELS[r]}</span>`).join('') || '<span class="chip">Tidak ada penerima</span>'}</div>
+          <span class="hint">Penerima ditentukan otomatis berdasarkan peran Anda (${ROLE_LABELS[role]}).</span>
+        </div>
+        <div class="field">
+          <label for="f-judul">Judul Laporan</label>
+          <input class="input" id="f-judul" required maxlength="150" value="${isEdit?escapeHtml(existing.judul):''}" placeholder="mis. Laporan Kegiatan Bulan September">
+        </div>
+        <div class="field">
+          <label for="f-tanggal">Tanggal Laporan</label>
+          <input class="input" id="f-tanggal" type="date" required value="${isEdit?existing.tanggal:todayISO}">
+        </div>
+        <div class="field">
+          <label for="f-isi">Isi Laporan</label>
+          <textarea class="input" id="f-isi" required maxlength="2000" placeholder="Tuliskan ringkasan kegiatan, capaian, kendala, dan rekomendasi...">${isEdit?escapeHtml(existing.isi):''}</textarea>
+        </div>
+        ${isEdit ? `<div class="field"><label>Nomor Laporan</label><input class="input" value="${escapeHtml(existing.nomor)}" disabled></div>` : ''}
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-action="close">Batal</button>
+        <button type="submit" class="btn btn-gold" id="report-save-btn">Simpan Laporan</button>
+      </div>
+    </form>
+  </div>`;
+  openModalHTML(html);
+  document.querySelectorAll('#active-modal [data-action="close"]').forEach(b=>b.addEventListener('click', closeModal));
+  document.getElementById('report-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const judul = document.getElementById('f-judul').value.trim();
+    const tanggal = document.getElementById('f-tanggal').value;
+    const isi = document.getElementById('f-isi').value.trim();
+    if(!judul || !tanggal || !isi) return;
+
+    const saveBtn = document.getElementById('report-save-btn');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="spin-small"></span> Menyimpan...';
+
+    if(isEdit){
+      const idx = state.data.reports.findIndex(x=>x.id===existing.id);
+      const backup = JSON.parse(JSON.stringify(state.data.reports[idx]));
+      state.data.reports[idx] = {...existing, judul, tanggal, isi, updatedAt: new Date().toISOString()};
+      const ok = await persist(`Perbarui laporan: ${judul}`);
+      if(ok){ toast('success','Laporan berhasil diperbarui.'); closeModal(); render(); }
+      else { state.data.reports[idx] = backup; }
+    } else {
+      const newReport = {
+        id: uid(),
+        nomor: nextNomor(role, tanggal),
+        authorId: state.currentUser.id,
+        authorRole: role,
+        recipients: recipients,
+        judul, isi, tanggal,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      state.data.reports.push(newReport);
+      const ok = await persist(`Tambah laporan: ${judul}`);
+      if(ok){ toast('success','Laporan berhasil disimpan.'); closeModal(); render(); }
+      else { state.data.reports = state.data.reports.filter(x=>x.id!==newReport.id); }
+    }
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Simpan Laporan';
+  });
+}
+
+/* ================================================================
+   MODAL: HAPUS
+   ================================================================ */
+function openDeleteModal(r){
+  const html = `
+  <div class="modal narrow">
+    <div class="modal-body" style="padding-top:26px;">
+      <div class="confirm-icon">${icon('alert',24)}</div>
+      <h3 style="text-align:center; font-size:17px; margin-bottom:8px;">Hapus Laporan Ini?</h3>
+      <p class="confirm-text">Anda akan menghapus laporan <b>"${escapeHtml(r.judul)}"</b> (No. ${escapeHtml(r.nomor)}). Tindakan ini tidak dapat dibatalkan.</p>
+    </div>
+    <div class="modal-foot" style="justify-content:center;">
+      <button class="btn btn-ghost" data-action="close">Batal</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Ya, Hapus Laporan</button>
+    </div>
+  </div>`;
+  openModalHTML(html);
+  document.querySelectorAll('#active-modal [data-action="close"]').forEach(b=>b.addEventListener('click', closeModal));
+  document.getElementById('confirm-delete-btn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('confirm-delete-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin-small"></span> Menghapus...';
+    const backup = JSON.parse(JSON.stringify(state.data.reports));
+    state.data.reports = state.data.reports.filter(x=>x.id!==r.id);
+    const ok = await persist(`Hapus laporan: ${r.judul}`);
+    if(ok){ toast('success','Laporan berhasil dihapus.'); closeModal(); render(); }
+    else { state.data.reports = backup; btn.disabled=false; btn.textContent='Ya, Hapus Laporan'; }
+  });
+}
+
+/* ================================================================
+   MODAL: LIHAT DETAIL (LAPORAN MASUK)
+   ================================================================ */
+function openViewModal(r){
+  const author = userById(r.authorId);
+  const html = `
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="report-nomor" style="margin-bottom:4px;">No. ${escapeHtml(r.nomor)}</div>
+        <h3>${escapeHtml(r.judul)}</h3>
+      </div>
+      <button class="close-x" data-action="close">${icon('x',20)}</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-block">
+        <div class="detail-label">Dari</div>
+        <div class="detail-value">${escapeHtml(author?author.nama:'-')} — ${ROLE_LABELS[r.authorRole]}</div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-label">Tanggal Laporan</div>
+        <div class="detail-value">${fmtDate(r.tanggal)}</div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-label">Ditujukan Kepada</div>
+        <div class="chip-row">${(r.recipients||[]).map(role=>`<span class="chip">${ROLE_LABELS[role]}</span>`).join('')}</div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-label">Isi Laporan</div>
+        <div class="detail-value">${escapeHtml(r.isi)}</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-action="close">Tutup</button>
+    </div>
+  </div>`;
+  openModalHTML(html);
+  document.querySelectorAll('#active-modal [data-action="close"]').forEach(b=>b.addEventListener('click', closeModal));
+}
+
+/* ================================================================
+   MODAL: PENGATURAN SERVER (GITHUB)
+   ================================================================ */
+function openSettingsModal(){
+  const cfg = state.config || {owner:'', repo:'', branch:'main', path:'data.json', token:''};
+  const html = `
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Pengaturan Server GitHub</h3>
+      <button class="close-x" data-action="close">${icon('x',20)}</button>
+    </div>
+    <form id="settings-form">
+      <div class="modal-body">
+        <div class="settings-note">${icon('key',14)} Hubungkan aplikasi ini ke repositori GitHub Anda agar data laporan tersimpan dan dapat diakses bersama secara nyata. Token akses hanya disimpan di peramban ini (localStorage) dan tidak dikirim ke pihak lain selain GitHub.</div>
+        <div class="field-row">
+          <div class="field">
+            <label for="s-owner">Pemilik / Organisasi</label>
+            <input class="input" id="s-owner" value="${escapeHtml(cfg.owner)}" placeholder="mis. nama-user-github">
+          </div>
+          <div class="field">
+            <label for="s-repo">Nama Repositori</label>
+            <input class="input" id="s-repo" value="${escapeHtml(cfg.repo)}" placeholder="mis. laporan-sekolah">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="s-branch">Branch</label>
+            <input class="input" id="s-branch" value="${escapeHtml(cfg.branch||'main')}" placeholder="main">
+          </div>
+          <div class="field">
+            <label for="s-path">Path Berkas Data</label>
+            <input class="input" id="s-path" value="${escapeHtml(cfg.path||'data.json')}" placeholder="data.json">
+          </div>
+        </div>
+        <div class="field">
+          <label for="s-token">Personal Access Token</label>
+          <div class="input-wrap">
+            <input class="input" id="s-token" type="password" value="${escapeHtml(cfg.token)}" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+            <button type="button" class="toggle-visibility" id="toggle-token">${icon('eye',16)}</button>
+          </div>
+          <span class="hint">Butuh izin (scope) "repo" atau "contents:write" agar dapat menyimpan perubahan. Kosongkan untuk mode baca-saja / mode lokal.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-action="clear-local">Gunakan Mode Lokal</button>
+        <button type="submit" class="btn btn-gold">Simpan &amp; Hubungkan</button>
+      </div>
+    </form>
+  </div>`;
+  openModalHTML(html);
+  document.querySelectorAll('#active-modal [data-action="close"]').forEach(b=>b.addEventListener('click', closeModal));
+  document.getElementById('toggle-token').addEventListener('click', ()=>{
+    const inp = document.getElementById('s-token');
+    inp.type = inp.type==='password' ? 'text' : 'password';
+  });
+  document.querySelector('[data-action="clear-local"]').addEventListener('click', ()=>{
+    localStorage.removeItem(LS_CONFIG);
+    closeModal();
+    location.reload();
+  });
+  document.getElementById('settings-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const newCfg = {
+      owner: document.getElementById('s-owner').value.trim(),
+      repo: document.getElementById('s-repo').value.trim(),
+      branch: document.getElementById('s-branch').value.trim() || 'main',
+      path: document.getElementById('s-path').value.trim() || 'data.json',
+      token: document.getElementById('s-token').value.trim()
+    };
+    if(!newCfg.owner || !newCfg.repo){ toast('error','Pemilik dan nama repositori wajib diisi.'); return; }
+    saveConfigToStorage(newCfg);
+    closeModal();
+    showLoading('Menghubungkan ke GitHub...');
+    try{
+      const {content, sha} = await ghFetchData(newCfg);
+      state.config = newCfg;
+      state.data = content;
+      state.sha = sha;
+      state.source = 'github';
+      hideLoading();
+      toast('success','Berhasil terhubung ke GitHub.');
+      render();
+    }catch(err){
+      hideLoading();
+      toast('error','Gagal terhubung: ' + err.message);
+    }
+  });
+}
+
+/* ================================================================
+   RENDER UTAMA
+   ================================================================ */
+function render(){
+  if(!state.currentUser){ renderLogin(); }
+  else { renderShell(); }
+}
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+(async function boot(){
+  showLoading('Memuat data...');
+  await initData();
+  restoreSession();
+  hideLoading();
+  render();
+})();
+</script>
+</body>
+</html>

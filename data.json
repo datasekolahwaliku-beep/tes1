@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "namaSekolah": "SMA Negeri 1 Harapan Bangsa",
+    "deskripsi": "Data Sistem Pelaporan Kinerja Terpadu",
+    "diperbarui": "2026-09-05T07:30:00+08:00"
+  },
+  "users": [
+    { "id": "u1", "username": "budi.bk",        "password": "sekolah123", "nama": "Budi Santoso, S.Pd.",        "role": "guru_bk" },
+    { "id": "u2", "username": "siti.osis",      "password": "sekolah123", "nama": "Siti Aminah, S.Pd.",         "role": "organisasi" },
+    { "id": "u3", "username": "andi.wakasek",   "password": "sekolah123", "nama": "Drs. Andi Wijaya, M.Pd.",    "role": "wakasek_kesiswaan" },
+    { "id": "u4", "username": "rina.kurikulum", "password": "sekolah123", "nama": "Rina Kurnia, M.Pd.",         "role": "kurikulum" },
+    { "id": "u5", "username": "dedi.humas",     "password": "sekolah123", "nama": "Dedi Prasetyo, S.Sos.",      "role": "humas" },
+    { "id": "u6", "username": "wati.sarpras",   "password": "sekolah123", "nama": "Wati Suherman, S.T.",        "role": "sarpras" },
+    { "id": "u7", "username": "joko.tu",        "password": "sekolah123", "nama": "Joko Susilo, S.E.",          "role": "tata_usaha" },
+    { "id": "u8", "username": "hendra.kepsek",  "password": "sekolah123", "nama": "Dr. Hendra Gunawan, M.M.",   "role": "kepala_sekolah" },
+    { "id": "u9", "username": "sri.pengawas",   "password": "sekolah123", "nama": "Dra. Sri Wahyuni, M.Pd.",    "role": "pengawas" }
+  ],
+  "reports": [
+    {
+      "id": "r1001",
+      "nomor": "001/BK/IX/2026",
+      "authorId": "u1",
+      "authorRole": "guru_bk",
+      "recipients": ["wakasek_kesiswaan", "kepala_sekolah"],
+      "judul": "Laporan Konseling Siswa Bulan Agustus",
+      "isi": "Selama bulan Agustus 2026 telah dilaksanakan layanan konseling individu kepada 18 siswa dan konseling kelompok pada 4 kelas. Fokus utama pada penyesuaian diri siswa baru kelas X dan pembinaan motivasi belajar. Tidak ditemukan kasus yang memerlukan eskalasi ke pihak luar sekolah.",
+      "tanggal": "2026-08-30",
+      "createdAt": "2026-08-30T09:12:00+08:00",
+      "updatedAt": "2026-08-30T09:12:00+08:00"
+    },
+    {
+      "id": "r1002",
+      "nomor": "002/BK/IX/2026",
+      "authorId": "u1",
+      "authorRole": "guru_bk",
+      "recipients": ["wakasek_kesiswaan", "kepala_sekolah"],
+      "judul": "Laporan Penanganan Kasus Kedisiplinan Kelas XI",
+      "isi": "Ditemukan 3 kasus keterlambatan berulang pada siswa kelas XI IPA 2. Telah dilakukan pemanggilan orang tua dan penandatanganan surat komitmen perbaikan. Rekomendasi: pemantauan kehadiran selama 2 minggu ke depan.",
+      "tanggal": "2026-09-02",
+      "createdAt": "2026-09-02T10:05:00+08:00",
+      "updatedAt": "2026-09-02T10:05:00+08:00"
+    },
+    {
+      "id": "r1003",
+      "nomor": "001/OSIS/IX/2026",
+      "authorId": "u2",
+      "authorRole": "organisasi",
+      "recipients": ["wakasek_kesiswaan", "kepala_sekolah"],
+      "judul": "Laporan Kegiatan Masa Pengenalan Lingkungan Sekolah",
+      "isi": "Kegiatan MPLS bagi siswa baru telah terlaksana dengan lancar selama 3 hari. Total peserta 312 siswa. Seluruh rangkaian acara berjalan sesuai jadwal tanpa kendala berarti. Dokumentasi dan absensi terlampir pada berkas terpisah.",
+      "tanggal": "2026-07-20",
+      "createdAt": "2026-07-20T14:30:00+08:00",
+      "updatedAt": "2026-07-20T14:30:00+08:00"
+    },
+    {
+      "id": "r1004",
+      "nomor": "002/OSIS/IX/2026",
+      "authorId": "u2",
+      "authorRole": "organisasi",
+      "recipients": ["wakasek_kesiswaan", "kepala_sekolah"],
+      "judul": "Laporan Persiapan Peringatan HUT Kemerdekaan RI",
+      "isi": "Panitia OSIS telah menyelesaikan 90% persiapan lomba dan upacara peringatan HUT RI ke-81. Kebutuhan tambahan berupa sound system portable untuk lapangan utama sedang diajukan ke bagian sarana prasarana.",
+      "tanggal": "2026-08-14",
+      "createdAt": "2026-08-14T11:00:00+08:00",
+      "updatedAt": "2026-08-14T11:00:00+08:00"
+    },
+    {
+      "id": "r1005",
+      "nomor": "001/WAKASEK-KES/IX/2026",
+      "authorId": "u3",
+      "authorRole": "wakasek_kesiswaan",
+      "recipients": ["kepala_sekolah", "pengawas"],
+      "judul": "Rekapitulasi Kesiswaan Semester Ganjil Bulan Agustus",
+      "isi": "Rekapitulasi menyeluruh kegiatan kesiswaan bulan Agustus mencakup laporan BK dan OSIS. Tingkat kehadiran siswa rata-rata 96,4%. Tidak ada pelanggaran berat. Kegiatan ekstrakurikuler berjalan sesuai program kerja tahunan.",
+      "tanggal": "2026-08-31",
+      "createdAt": "2026-08-31T16:00:00+08:00",
+      "updatedAt": "2026-08-31T16:00:00+08:00"
+    },
+    {
+      "id": "r1006",
+      "nomor": "001/KUR/IX/2026",
+      "authorId": "u4",
+      "authorRole": "kurikulum",
+      "recipients": ["kepala_sekolah", "pengawas"],
+      "judul": "Laporan Capaian Kurikulum Merdeka Triwulan III",
+      "isi": "Implementasi Kurikulum Merdeka pada kelas X dan XI berjalan sesuai rencana. Rata-rata capaian pembelajaran mencapai 82%. Pelatihan asesmen formatif bagi guru mata pelajaran direncanakan pada minggu ketiga September.",
+      "tanggal": "2026-09-01",
+      "createdAt": "2026-09-01T08:45:00+08:00",
+      "updatedAt": "2026-09-01T08:45:00+08:00"
+    },
+    {
+      "id": "r1007",
+      "nomor": "001/HUMAS/IX/2026",
+      "authorId": "u5",
+      "authorRole": "humas",
+      "recipients": ["kepala_sekolah", "pengawas"],
+      "judul": "Laporan Kerja Sama dengan Mitra Industri",
+      "isi": "Telah dijajaki kerja sama praktik kerja lapangan dengan 4 perusahaan mitra baru di bidang teknologi informasi. Penandatanganan nota kesepahaman (MoU) direncanakan pada akhir September 2026.",
+      "tanggal": "2026-09-03",
+      "createdAt": "2026-09-03T13:20:00+08:00",
+      "updatedAt": "2026-09-03T13:20:00+08:00"
+    },
+    {
+      "id": "r1008",
+      "nomor": "001/SARPRAS/IX/2026",
+      "authorId": "u6",
+      "authorRole": "sarpras",
+      "recipients": ["kepala_sekolah", "pengawas"],
+      "judul": "Laporan Kondisi dan Perawatan Fasilitas Laboratorium",
+      "isi": "Perawatan berkala laboratorium komputer dan IPA telah dilaksanakan. Terdapat 3 unit komputer yang memerlukan penggantian komponen. Pengajuan anggaran perbaikan telah disampaikan ke bagian tata usaha.",
+      "tanggal": "2026-08-28",
+      "createdAt": "2026-08-28T09:00:00+08:00",
+      "updatedAt": "2026-08-28T09:00:00+08:00"
+    },
+    {
+      "id": "r1009",
+      "nomor": "001/TU/IX/2026",
+      "authorId": "u7",
+      "authorRole": "tata_usaha",
+      "recipients": ["kepala_sekolah", "pengawas"],
+      "judul": "Laporan Administrasi Keuangan dan Kepegawaian Bulan Agustus",
+      "isi": "Realisasi anggaran operasional bulan Agustus mencapai 78% dari pagu triwulan. Seluruh administrasi kepegawaian termasuk absensi dan penggajian telah diselesaikan tepat waktu tanpa kendala.",
+      "tanggal": "2026-08-31",
+      "createdAt": "2026-08-31T17:10:00+08:00",
+      "updatedAt": "2026-08-31T17:10:00+08:00"
+    },
+    {
+      "id": "r1010",
+      "nomor": "001/KEPSEK/IX/2026",
+      "authorId": "u8",
+      "authorRole": "kepala_sekolah",
+      "recipients": ["pengawas"],
+      "judul": "Laporan Kinerja Sekolah Triwulan III Tahun Ajaran 2026/2027",
+      "isi": "Secara umum seluruh bidang menunjukkan kinerja yang baik. Kesiswaan, kurikulum, humas, sarana prasarana, dan tata usaha telah menyampaikan laporan rutin dan menunjukkan capaian sesuai target. Fokus perbaikan pada pemeliharaan fasilitas laboratorium.",
+      "tanggal": "2026-09-04",
+      "createdAt": "2026-09-04T15:00:00+08:00",
+      "updatedAt": "2026-09-04T15:00:00+08:00"
+    }
+  ]
+}
